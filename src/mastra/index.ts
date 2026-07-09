@@ -1,3 +1,4 @@
+import { leadQualificationWorkflow } from './workflows/lead-qualification-workflow';
 import { Mastra } from '@mastra/core/mastra';
 import { PinoLogger } from '@mastra/loggers';
 import { LibSQLStore } from '@mastra/libsql';
@@ -15,6 +16,9 @@ import { leadQualificationAgent } from './agents/lead-qualification-agent';
 export const mastra = new Mastra({
   agents: {
     leadQualificationAgent,
+  },
+  workflows: {
+    leadQualificationWorkflow,
   },
   storage: new MastraCompositeStore({
     id: 'composite-storage',
