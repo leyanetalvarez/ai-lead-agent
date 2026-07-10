@@ -2,6 +2,7 @@ import { createWorkflow, createStep } from '@mastra/core/workflows';
 import { z } from 'zod';
 import { leadQualificationAgent } from '../agents/lead-qualification-agent';
 import { leadResultSchema } from '../schemas/lead-result-schema';
+import { leadService } from '../services/lead-service';
 
 const leadInputSchema = z.object({
   name: z.string(),
@@ -14,7 +15,12 @@ const leadInputSchema = z.object({
 const qualifyLeadStep = createStep({
   id: 'qualify-lead-step',
   inputSchema: leadInputSchema,
-  outputSchema: leadResultSchema,
+  outputSchema: z.object({
+    lead: leadInputSchema,
+    result: leadResultSchema,
+    saved_lead_id: z.string(),
+    storage: z.string(),
+  }),
   execute: async ({ inputData }) => {
     const response = await leadQualificationAgent.generate([
       {
@@ -33,7 +39,14 @@ Message: ${inputData.message}
 
     const parsedResult = leadResultSchema.parse(JSON.parse(response.text));
 
-    return parsedResult;
+    const savedLead = await leadService.saveLead(inputData, parsedResult);
+
+    return {
+      lead: inputData,
+      result: parsedResult,
+      saved_lead_id: savedLead.id,
+      storage: savedLead.storage,
+    };
   },
 });
 
