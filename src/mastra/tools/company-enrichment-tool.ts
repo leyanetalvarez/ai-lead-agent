@@ -16,10 +16,10 @@ export const companyEnrichmentTool = createTool({
     location: z.string(),
     enrichment_source: z.string(),
   }),
-  execute: async ({ context }) => {
+  execute: async (input) => {
     return {
-      company: context.company,
-      website: context.website,
+      company: input.company,
+      website: input.website,
       industry: 'Software / AI Automation',
       company_size: '11-50 employees',
       location: 'Remote / Unknown',
